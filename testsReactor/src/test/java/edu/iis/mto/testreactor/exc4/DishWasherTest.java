@@ -71,10 +71,40 @@ public class DishWasherTest {
     }
     
     @Test
-    public void StartingWashWithWithIntenseProgramShouldReturn120Minutes() {
+    public void StartingWashWithIntenseProgramShouldReturn120Minutes() {
         Mockito.when(door.closed()).thenReturn(true);
         Mockito.when(dirtFilter.capacity()).thenReturn(100.0d);
         runResult = dishWasher.start(programConfiguration);
         assertEquals(120, runResult.getRunMinutes());
+    }
+    
+    @Test
+    public void StartingRinsingShouldReturn14Minutes() {
+        Mockito.when(door.closed()).thenReturn(true);
+        Mockito.when(dirtFilter.capacity()).thenReturn(100.0d);
+        programConfiguration = ProgramConfiguration.builder()
+                .withProgram(WashingProgram.RINSE)
+                .withTabletsUsed(true)
+                .build();
+        runResult = dishWasher.start(programConfiguration);
+        assertEquals(14, runResult.getRunMinutes());
+    }
+    
+    @Test
+    public void ErrorPumpWhilePouringShouldReturnERROR_PUMPstatus() throws PumpException {
+        Mockito.when(door.closed()).thenReturn(true);
+        Mockito.when(dirtFilter.capacity()).thenReturn(100.0d);
+        doThrow(PumpException.class).when(waterPump).pour(any(WashingProgram.class));
+        runResult = dishWasher.start(programConfiguration);
+        assertEquals(Status.ERROR_PUMP, runResult.getStatus());
+    }
+    
+    @Test
+    public void ErrorEngineWhileWorkingShouldReturnERROR_ENGINEstatus() throws EngineException {
+        Mockito.when(door.closed()).thenReturn(true);
+        Mockito.when(dirtFilter.capacity()).thenReturn(100.0d);
+        doThrow(EngineException.class).when(engine).runProgram(any(Integer.class));
+        runResult = dishWasher.start(programConfiguration);
+        assertEquals(Status.ERROR_PROGRAM, runResult.getStatus());
     }
 }
