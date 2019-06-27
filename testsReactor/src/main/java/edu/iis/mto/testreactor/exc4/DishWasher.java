@@ -21,7 +21,7 @@ public class DishWasher {
 
     public RunResult start(ProgramConfiguration program) {
         requireNonNull(program, "program == null");
-        if (door.closed()) {
+        if (!door.closed()) {
             return error(DOOR_OPEN_ERROR);
         }
         if (filterIsClean(program)) {
