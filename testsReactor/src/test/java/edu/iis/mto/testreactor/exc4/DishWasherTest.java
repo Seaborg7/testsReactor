@@ -37,7 +37,7 @@ public class DishWasherTest {
         MockitoAnnotations.initMocks(this);
         dishWasher = new DishWasher(waterPump, engine, dirtFilter, door);
         programConfiguration = ProgramConfiguration.builder()
-                                                   .withProgram(any(WashingProgram.class))
+                                                   .withProgram(WashingProgram.INTENSIVE)
                                                    .withTabletsUsed(true)
                                                    .build();
     }
@@ -52,6 +52,14 @@ public class DishWasherTest {
         Mockito.when(door.closed()).thenReturn(false);
         runResult = dishWasher.start(programConfiguration);
         assertEquals(Status.DOOR_OPEN_ERROR, runResult.getStatus());
+    }
+    
+    @Test
+    public void StartingWashWithNotEnoughtFilterCapacityShouldReturnERROR_FILTER() {
+        Mockito.when(door.closed()).thenReturn(true);
+        Mockito.when(dirtFilter.capacity()).thenReturn(10.0d);
+        runResult = dishWasher.start(programConfiguration);
+        assertEquals(Status.ERROR_FILTER, runResult.getStatus());
     }
 
 }
