@@ -61,5 +61,20 @@ public class DishWasherTest {
         runResult = dishWasher.start(programConfiguration);
         assertEquals(Status.ERROR_FILTER, runResult.getStatus());
     }
-
+    
+    @Test
+    public void StartingWashWellShouldReturnSuccess() {
+        Mockito.when(door.closed()).thenReturn(true);
+        Mockito.when(dirtFilter.capacity()).thenReturn(100.0d);
+        runResult = dishWasher.start(programConfiguration);
+        assertEquals(Status.SUCCESS, runResult.getStatus());
+    }
+    
+    @Test
+    public void StartingWashWithWithIntenseProgramShouldReturn120Minutes() {
+        Mockito.when(door.closed()).thenReturn(true);
+        Mockito.when(dirtFilter.capacity()).thenReturn(100.0d);
+        runResult = dishWasher.start(programConfiguration);
+        assertEquals(120, runResult.getRunMinutes());
+    }
 }
